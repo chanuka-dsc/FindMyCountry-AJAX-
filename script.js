@@ -80,23 +80,35 @@ const renderCountry = (data, neighbour) => {
 
 const getCountryData = country => {
   fetch(`https://restcountries.com/v3.1/name/${country}`)
-    .then(response =>
-      response.json().then(data => {
-        renderCountry(data[0], false);
-        const neighbour = data[0].borders[0];
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`Country not found`);
+      }
 
-        if (!neighbour) {
-          return;
-        }
+      return response.json();
+    })
 
-        return fetch(`https://restcountries.com/v3.1/alpha/${neighbour}`);
-      })
-    )
-    .then(neighbourResponse =>
-      neighbourResponse.json().then(data => {
-        renderCountry(data[0], true);
-      })
-    )
+    .then(data => {
+      renderCountry(data[0], false);
+      const neighbour = data[0].borders[0];
+
+      if (!neighbour) {
+        return;
+      }
+
+      return fetch(`https://restcountries.com/v3.1/alpha/${neighbour}`);
+    })
+
+    .then(neighbourResponse => {
+      if (!neighbourResponse.ok) {
+        throw new Error(`Country not found`);
+      }
+      return neighbourResponse.json();
+    })
+    .then(data => {
+      renderCountry(data[0], true);
+    })
+
     .catch(error => {
       console.error(`${error} ❌❌❌ `);
       renderError('Something whent wrong !!! ❌❌❌');
@@ -109,5 +121,5 @@ const getCountryData = country => {
 //Calling the function
 
 btn.addEventListener('click', function () {
-  getCountryData('germany');
+  getCountryData('lanka');
 });
