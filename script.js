@@ -53,6 +53,18 @@ The new method of making AJAX calls using the fetch method
 const btn = document.querySelector('.btn-country');
 const countriesContainer = document.querySelector('.countries');
 
+const getJSON = (url, errorMsg = 'Something went wrong') => {
+  return fetch(url).then(response => {
+    if (!response.ok) {
+      throw new Error(`${errorMsg} (${response.status})`);
+    }
+
+    console.log(response);
+
+    return response.json();
+  });
+};
+
 const renderError = msg => {
   countriesContainer.insertAdjacentText('beforeend', msg);
 };
@@ -79,33 +91,20 @@ const renderCountry = (data, neighbour) => {
 };
 
 const getCountryData = country => {
-  fetch(`https://restcountries.com/v3.1/name/${country}`)
-    .then(response => {
-      if (!response.ok) {
-        throw new Error(`Country not found`);
-      }
-
-      return response.json();
-    })
-
+  getJSON(`https://restcountries.com/v3.1/name/${country}`, 'country not found')
     .then(data => {
       renderCountry(data[0], false);
+
+      if (!data[0].borders) throw new Error(`No neighbour`);
       const neighbour = data[0].borders[0];
 
-      if (!neighbour) {
-        return;
-      }
-
-      return fetch(`https://restcountries.com/v3.1/alpha/${neighbour}`);
-    })
-
-    .then(neighbourResponse => {
-      if (!neighbourResponse.ok) {
-        throw new Error(`Country not found`);
-      }
-      return neighbourResponse.json();
+      return getJSON(
+        `https://restcountries.com/v3.1/alpha/${neighbour}`,
+        'country not found'
+      );
     })
     .then(data => {
+      console.log(data);
       renderCountry(data[0], true);
     })
 
@@ -121,5 +120,5 @@ const getCountryData = country => {
 //Calling the function
 
 btn.addEventListener('click', function () {
-  getCountryData('lanka');
+  getCountryData('australia');
 });
