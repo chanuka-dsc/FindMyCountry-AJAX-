@@ -117,8 +117,32 @@ const getCountryData = country => {
     });
 };
 
+51.50354 - 0.12768;
+const whereAmI = (long, lat) => {
+  fetch(`https://geocode.xyz/${long},${lat}?geoit=json`)
+    .then(response => {
+      console.log(response);
+      if (response.status === 403) {
+        throw new Error(
+          `Maximum allowed reloads per second exceeded ${response.status}`
+        );
+      } else if (!response.ok) {
+        throw new Error(`location not found ${response.status}`);
+      }
+      return response.json();
+    })
+    .then(data => {
+      console.log(data);
+      console.log(`you are joining from ${data.city}, ${data.country}`);
+      getCountryData(data.country);
+    })
+    .catch(error => {
+      console.log(`There is an error : ${error}`);
+    });
+};
+
 //Calling the function
 
 btn.addEventListener('click', function () {
-  getCountryData('australia');
+  whereAmI(52.508, 13.381);
 });
