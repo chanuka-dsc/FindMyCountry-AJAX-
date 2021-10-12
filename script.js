@@ -59,8 +59,6 @@ const getJSON = (url, errorMsg = 'Something went wrong') => {
       throw new Error(`${errorMsg} (${response.status})`);
     }
 
-    console.log(response);
-
     return response.json();
   });
 };
@@ -104,7 +102,6 @@ const getCountryData = country => {
       );
     })
     .then(data => {
-      console.log(data);
       renderCountry(data[0], true);
     })
 
@@ -131,7 +128,6 @@ const whereAmI = () => {
       return fetch(`https://geocode.xyz/${lat},${long}?geoit=json`);
     })
     .then(response => {
-      console.log(response);
       if (response.status === 403) {
         throw new Error(
           `Maximum allowed reloads per second exceeded ${response.status}`
@@ -142,7 +138,6 @@ const whereAmI = () => {
       return response.json();
     })
     .then(data => {
-      console.log(data);
       console.log(`you are joining from ${data.city}, ${data.country}`);
       getCountryData(data.country);
     })
