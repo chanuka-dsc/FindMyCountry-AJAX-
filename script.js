@@ -117,9 +117,19 @@ const getCountryData = country => {
     });
 };
 
-51.50354 - 0.12768;
-const whereAmI = (long, lat) => {
-  fetch(`https://geocode.xyz/${long},${lat}?geoit=json`)
+const getCordinates = () => {
+  return new Promise((resolve, reject) => {
+    navigator.geolocation.getCurrentPosition(resolve, reject);
+  });
+};
+
+const whereAmI = () => {
+  getCordinates()
+    .then(pos => {
+      const { longitude: long, latitude: lat } = pos.coords;
+
+      return fetch(`https://geocode.xyz/${lat},${long}?geoit=json`);
+    })
     .then(response => {
       console.log(response);
       if (response.status === 403) {
@@ -144,5 +154,5 @@ const whereAmI = (long, lat) => {
 //Calling the function
 
 btn.addEventListener('click', function () {
-  whereAmI(52.508, 13.381);
+  whereAmI();
 });
